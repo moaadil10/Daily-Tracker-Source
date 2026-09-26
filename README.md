@@ -1,4 +1,4 @@
-# Daily Tracker — Source
+# Personalized Daily Tracker — Source
 
 Source code for a personal habit tracker: sleep, prayers, learning (with stopwatch), water,
 office hours, entertainment, bad habits, custom habits, and week/month analysis.
