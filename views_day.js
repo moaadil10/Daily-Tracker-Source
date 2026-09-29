@@ -128,15 +128,22 @@ function rowHtml(listKey, i, x) {
 const SW_COLOR = { learn: 'var(--learn)', quran: 'var(--quran)', ent: 'var(--ent)', bad: 'var(--bad)' };
 const SW_LEN = 2 * Math.PI * 44;
 function runningIdx(day, k) { return (day[k] || []).findIndex(x => x.sw && x.s && !x.e); }
-function fmtClock(sec) { sec = Math.max(0, Math.floor(sec)); return pad2(Math.floor(sec / 3600)) + ':' + pad2(Math.floor(sec / 60) % 60) + ':' + pad2(sec % 60); }
+function fmtClock(sec) {
+  sec = Math.max(0, Math.floor(sec));
+  const h = Math.floor(sec / 3600), m = Math.floor(sec / 60) % 60, s = sec % 60;
+  return h > 0 ? (h + ':' + pad2(m) + ':' + pad2(s)) : (pad2(m) + ':' + pad2(s));
+}
 
 function swInner(k, day) {
   const i = runningIdx(day, k), run = i >= 0, x = run ? day[k][i] : null;
   const sec = run && x.t0 ? (Date.now() - x.t0) / 1000 : 0;
   const off = SW_LEN * (1 - (sec % 60) / 60);
-  return '<div class="swring' + (run ? ' run' : '') + '"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="bg" cx="50" cy="50" r="44"/><circle class="fg" cx="50" cy="50" r="44" stroke-dasharray="' + SW_LEN.toFixed(2) + '" stroke-dashoffset="' + (run ? off.toFixed(2) : SW_LEN.toFixed(2)) + '" transform="rotate(-90 50 50)"/></svg><span class="pulse"></span></div>' +
-    '<div class="swtxt"><div class="swdig" data-sw="' + k + '" role="timer">' + fmtClock(sec) + '</div><div class="swlbl">' + (run ? 'Running since ' + esc(fmtTime12(x.s)) : 'Stopwatch') + '</div></div>' +
-    '<button type="button" class="swbtn' + (run ? ' stop' : '') + '" data-act="sw-toggle" data-list="' + k + '">' + (run ? 'Stop' : 'Start') + '</button>';
+  const icon = run
+    ? '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="3" width="10" height="10" rx="2" fill="currentColor"/></svg>'
+    : '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.8v10.4a.8.8 0 0 0 1.22.68l8.2-5.2a.8.8 0 0 0 0-1.36l-8.2-5.2A.8.8 0 0 0 4.5 2.8z" fill="currentColor"/></svg>';
+  return '<div class="sw-main"><div class="swring' + (run ? ' run' : '') + '"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="bg" cx="50" cy="50" r="44"/><circle class="fg" cx="50" cy="50" r="44" stroke-dasharray="' + SW_LEN.toFixed(2) + '" stroke-dashoffset="' + (run ? off.toFixed(2) : SW_LEN.toFixed(2)) + '" transform="rotate(-90 50 50)"/></svg><span class="pulse"></span></div>' +
+    '<div class="swtxt"><div class="swdig" data-sw="' + k + '" role="timer">' + fmtClock(sec) + '</div><div class="swlbl">' + (run ? 'Running since ' + esc(fmtTime12(x.s)) : 'Stopwatch') + '</div></div></div>' +
+    '<button type="button" class="swbtn' + (run ? ' stop' : '') + '" data-act="sw-toggle" data-list="' + k + '">' + icon + '<span>' + (run ? 'Stop' : 'Start') + '</span></button>';
 }
 
 function listHtml(listKey, day, addLabel) {
